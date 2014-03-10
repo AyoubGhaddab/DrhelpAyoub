@@ -6,10 +6,13 @@ package Dhelp.presentation.Categorie;
 
 import Dhelp.DAO.AddCommentDAO;
 import Dhelp.DAO.CategorieDAO;
+import Dhelp.entities.Admin;
 import Dhelp.entities.Categorie;
 import Dhelp.entities.Sujets;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -18,12 +21,17 @@ import javax.swing.table.DefaultTableModel;
  * @author user
  */
 public class ManageCategorie extends javax.swing.JFrame {
-
-    /**
-     * Creates new form ManageCategorie
-     */
+    Admin administrator = null;
     public ManageCategorie() {
         initComponents();
+        bu_loadActionPerformed(null);
+        jp_changename.setVisible(false);
+        jp_addnewCat.setVisible(false);
+    }
+      public ManageCategorie(Admin a) {
+        initComponents() ;
+        administrator = a;
+        
         bu_loadActionPerformed(null);
         jp_changename.setVisible(false);
         jp_addnewCat.setVisible(false);
@@ -45,13 +53,14 @@ public class ManageCategorie extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tables = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
+        bu_add = new javax.swing.JButton();
         bu_load = new javax.swing.JButton();
         jp_changename = new javax.swing.JPanel();
         tb_nomcat = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         bu_addnewCat = new javax.swing.JButton();
         tb_hide = new javax.swing.JButton();
-        bu_add = new javax.swing.JButton();
         jp_addnewCat = new javax.swing.JPanel();
         tb_newnomCat = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
@@ -59,6 +68,11 @@ public class ManageCategorie extends javax.swing.JFrame {
         tb_hidenewCat = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Dhelp/image/003.png"))); // NOI18N
 
@@ -97,13 +111,34 @@ public class ManageCategorie extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(tables);
 
+        jButton1.setText("Supprimer");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        bu_add.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Dhelp/image/miniadd.png"))); // NOI18N
+        bu_add.setText("Ajouter");
+        bu_add.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bu_addActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(bu_add)
+                        .addGap(0, 96, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -111,7 +146,11 @@ public class ManageCategorie extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(284, 284, 284))
+                .addGap(144, 144, 144)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(bu_add))
+                .addGap(115, 115, 115))
         );
 
         bu_load.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Dhelp/image/Load.png"))); // NOI18N
@@ -151,7 +190,7 @@ public class ManageCategorie extends javax.swing.JFrame {
                 .addGroup(jp_changenameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jp_changenameLayout.createSequentialGroup()
                         .addComponent(tb_nomcat, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(19, Short.MAX_VALUE))
+                        .addContainerGap(32, Short.MAX_VALUE))
                     .addGroup(jp_changenameLayout.createSequentialGroup()
                         .addComponent(bu_addnewCat, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -171,14 +210,6 @@ public class ManageCategorie extends javax.swing.JFrame {
                     .addComponent(tb_hide))
                 .addContainerGap(53, Short.MAX_VALUE))
         );
-
-        bu_add.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Dhelp/image/miniadd.png"))); // NOI18N
-        bu_add.setText("Ajouter");
-        bu_add.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bu_addActionPerformed(evt);
-            }
-        });
 
         jp_addnewCat.setBorder(javax.swing.BorderFactory.createTitledBorder("Ajouter Une nouvelle categorie"));
 
@@ -241,18 +272,16 @@ public class ManageCategorie extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(bu_add)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(bu_load)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(bu_deconnect)
                             .addComponent(lb_login)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jp_addnewCat, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jp_changename, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jp_changename, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jp_addnewCat, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 76, Short.MAX_VALUE)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -268,16 +297,15 @@ public class ManageCategorie extends javax.swing.JFrame {
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(bu_deconnect)
-                                .addComponent(bu_load)
-                                .addComponent(bu_add)))
+                                .addComponent(bu_load)))
                         .addComponent(jLabel1)))
                 .addGap(26, 26, 26)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jp_changename, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jp_addnewCat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jp_addnewCat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap(142, Short.MAX_VALUE))
         );
 
@@ -285,11 +313,14 @@ public class ManageCategorie extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void bu_loadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bu_loadActionPerformed
-        CategorieDAO cat = new CategorieDAO();
+        AddCommentDAO cat = new AddCommentDAO();
        ArrayList<Categorie> lp = new ArrayList<>();
-       
-       for(Object em:(ArrayList)cat.DisplayAllCategories())
-           lp.add((Categorie)em);
+        try {
+            for(Object em:(ArrayList)cat.GetNomCat())
+                lp.add((Categorie)em);
+        } catch (SQLException ex) {
+           
+        }
 
     DefaultTableModel amod = new DefaultTableModel();
     Object[] tableColumnNames = new Object[2];
@@ -401,6 +432,14 @@ public class ManageCategorie extends javax.swing.JFrame {
        jp_addnewCat.setVisible(false);
     }//GEN-LAST:event_tb_hidenewCatActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        lb_login.setText(administrator.getLogin_admin());
+    }//GEN-LAST:event_formWindowActivated
+
     /**
      * @param args the command line arguments
      */
@@ -447,6 +486,7 @@ public class ManageCategorie extends javax.swing.JFrame {
     private javax.swing.JButton bu_addnewCat;
     private javax.swing.JButton bu_deconnect;
     private javax.swing.JButton bu_load;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

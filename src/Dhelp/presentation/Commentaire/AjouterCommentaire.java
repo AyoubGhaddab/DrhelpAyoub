@@ -11,12 +11,16 @@ import Dhelp.entities.Commentaires;
 import Dhelp.entities.Personnes;
 import Dhelp.entities.Sujets;
 import Dhelp.presentation.DrhelpMenu;
+import Dhelp.presentation.Irapport.Gene;
+import Dhelp.presentation.Irapport.Generator;
 import Dhelp.presentation.LoginDoctor;
 import Dhelp.presentation.Mail.ReclamationClient;
+import Dhelp.util.MyConnection;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -24,6 +28,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
 /**
  *
  * @author user
@@ -31,6 +38,7 @@ import javax.swing.table.DefaultTableModel;
 public class AjouterCommentaire extends javax.swing.JFrame {
    Sujets loadsujet = null;
    Personnes ptdr=null ;
+   static String gigi=null ;
     private int dialogButton;
     public AjouterCommentaire() {
         
@@ -66,9 +74,11 @@ public class AjouterCommentaire extends javax.swing.JFrame {
      public AjouterCommentaire(Personnes p) {
 
          initComponents();
+         tb_telecharger.setVisible(false);
          Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
          ptdr=p;
+         tb_afficherComments.setVisible(false);
          bu_update.setVisible(false);
         lb_login.setText(p.getLogin_personnes());
         ta_contenu.setEditable(false);
@@ -127,6 +137,7 @@ public class AjouterCommentaire extends javax.swing.JFrame {
         tb_hidesujet = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         lb_nbrcomm = new javax.swing.JLabel();
+        tb_afficherComments = new javax.swing.JButton();
         jp_comment = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         ta_commentaire = new javax.swing.JTextArea();
@@ -141,8 +152,11 @@ public class AjouterCommentaire extends javax.swing.JFrame {
         lb_login = new javax.swing.JLabel();
         bu_deconnect = new javax.swing.JButton();
         tb_sujet = new javax.swing.JButton();
+        tb_telecharger = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Forum");
+        setResizable(false);
 
         jLabel2.setFont(new java.awt.Font("Tunga", 0, 22)); // NOI18N
         jLabel2.setText("Forum et sujets");
@@ -283,6 +297,13 @@ public class AjouterCommentaire extends javax.swing.JFrame {
 
         lb_nbrcomm.setText("jLabel5");
 
+        tb_afficherComments.setText("afficher commentaires");
+        tb_afficherComments.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tb_afficherCommentsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jp_sujetLayout = new javax.swing.GroupLayout(jp_sujet);
         jp_sujet.setLayout(jp_sujetLayout);
         jp_sujetLayout.setHorizontalGroup(
@@ -300,7 +321,9 @@ public class AjouterCommentaire extends javax.swing.JFrame {
                         .addComponent(tb_comment)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(tb_hidesujet)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 164, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tb_afficherComments)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 85, Short.MAX_VALUE)
                         .addComponent(lb_nbrcomm)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel4)))
@@ -320,7 +343,8 @@ public class AjouterCommentaire extends javax.swing.JFrame {
                     .addComponent(tb_comment, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tb_hidesujet)
                     .addComponent(jLabel4)
-                    .addComponent(lb_nbrcomm))
+                    .addComponent(lb_nbrcomm)
+                    .addComponent(tb_afficherComments))
                 .addContainerGap())
         );
 
@@ -450,6 +474,15 @@ public class AjouterCommentaire extends javax.swing.JFrame {
             }
         });
 
+        tb_telecharger.setFont(new java.awt.Font("Tunga", 0, 18)); // NOI18N
+        tb_telecharger.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Dhelp/image/download.png"))); // NOI18N
+        tb_telecharger.setText("Télécharger");
+        tb_telecharger.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tb_telechargerActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -471,8 +504,10 @@ public class AjouterCommentaire extends javax.swing.JFrame {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(tb_loadSujet)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(tb_sujet)))
-                                .addGap(97, 97, 97))
+                                        .addComponent(tb_sujet)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(tb_telecharger)))
+                                .addGap(16, 16, 16))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jp_sujet, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)))
@@ -501,6 +536,17 @@ public class AjouterCommentaire extends javax.swing.JFrame {
                     .addComponent(jScrollBar1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGap(44, 44, 44)
+                                    .addComponent(jButton1))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                    .addGap(8, 8, 8)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lb_login)
+                                        .addComponent(bu_deconnect))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -511,24 +557,15 @@ public class AjouterCommentaire extends javax.swing.JFrame {
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                             .addComponent(cb_cat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addComponent(tb_loadSujet)
-                                            .addComponent(tb_sujet)))))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(44, 44, 44)
-                                .addComponent(jButton1))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(8, 8, 8)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(lb_login)
-                                    .addComponent(bu_deconnect))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(27, 27, 27)
+                                            .addComponent(tb_sujet)
+                                            .addComponent(tb_telecharger, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                        .addGap(18, 18, 18)
                         .addComponent(jp_tbsujet, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jp_comment, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jp_sujet, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jp_sujet, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jp_comment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 30, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -536,7 +573,7 @@ public class AjouterCommentaire extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cb_catActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cb_catActionPerformed
-        
+        tb_telecharger.setVisible(true);
 
     }//GEN-LAST:event_cb_catActionPerformed
 
@@ -622,10 +659,18 @@ public class AjouterCommentaire extends javax.swing.JFrame {
                 bu_update.setVisible(true);
                 bu_delete.setVisible(true);
             }
+            
             else
             {
                 bu_update.setVisible(false);
                 bu_delete.setVisible(false);
+            }
+            if(!"0".equals(lb_nbrcomm.getText())){
+                tb_afficherComments.setVisible(true);
+            }
+            if(lb_nbrcomm.getText().equals("0")){
+                tb_afficherComments.setVisible(false);
+                
             }
         
         
@@ -763,6 +808,40 @@ if(dialogResult == JOptionPane.YES_OPTION){
         }
     }//GEN-LAST:event_bu_deleteActionPerformed
 
+    private void tb_afficherCommentsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tb_afficherCommentsActionPerformed
+        AfficherCommenter ac = new AfficherCommenter(loadsujet);
+        ac.setVisible(true);
+    }//GEN-LAST:event_tb_afficherCommentsActionPerformed
+
+    private void tb_telechargerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tb_telechargerActionPerformed
+        String X=cb_cat.getSelectedItem().toString();
+         Map  parameters = new HashMap();
+            parameters.put("i_categ",X);
+        Connection connection;
+        try {
+           
+            // - Connexion à la base
+            connection=MyConnection.getInstance();
+            // - Chargement et compilation du rapport
+            System.out.println("oci");
+            JasperDesign jasperDesign = JRXmlLoader.load("C:\\Users\\user\\Desktop\\go\\Google Drive\\Drhelp\\src\\Dhelp\\presentation\\Irapport\\test1.jrxml");
+            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+            // - Paramètres à envoyer au rapport
+           
+            
+            // - Execution du rapport
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, connection);
+            // - Création du rapport au format PDF
+            JasperExportManager.exportReportToPdfFile(jasperPrint, "C:\\Users\\user\\Desktop\\myreport.pdf");
+            System.out.println("success");
+        }
+
+        catch (JRException e) {
+            System.out.println("erreur de compilation"+ e.getMessage());
+         } 
+        
+    }//GEN-LAST:event_tb_telechargerActionPerformed
+   
     /**
      * @param args the command line arguments
      */
@@ -831,6 +910,7 @@ if(dialogResult == JOptionPane.YES_OPTION){
     private javax.swing.JTextArea ta_contenu;
     private javax.swing.JTable table_s;
     private javax.swing.JButton tb_addCmt;
+    private javax.swing.JButton tb_afficherComments;
     private javax.swing.JButton tb_cancel;
     private javax.swing.JButton tb_comment;
     private javax.swing.JButton tb_hide;
@@ -839,5 +919,6 @@ if(dialogResult == JOptionPane.YES_OPTION){
     private javax.swing.JButton tb_loadSujet;
     private javax.swing.JTextField tb_search;
     private javax.swing.JButton tb_sujet;
+    private javax.swing.JButton tb_telecharger;
     // End of variables declaration//GEN-END:variables
 }

@@ -6,14 +6,24 @@ package Dhelp.presentation;
 
 import  Dhelp.DAO.*;
 import Dhelp.entities.Personnes;
+import chrriis.dj.nativeswing.swtimpl.NativeInterface;
+import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
+import chrriis.dj.nativeswing.swtimpl.components.WebBrowserAdapter;
+import chrriis.dj.nativeswing.swtimpl.components.WebBrowserNavigationEvent;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Dimension2D;
+import java.io.IOException;
+import java.io.StringReader;
 import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
-import net.proteanit.sql.DbUtils;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.parser.ParserDelegator;
+
 
 /**
  *
@@ -25,6 +35,35 @@ public class LoginDoctor extends javax.swing.JFrame {
      * Creates new form LoginDoctor
      */Boolean Auth = false;
     private String emailN="";;
+    JFrame authFrame = new JFrame();
+        AddDoctor d11 =new AddDoctor();
+
+
+    
+    
+    public static String API_KEY = "1387115584846579";
+public static String SECRET = "853c56c1bec80de4160889776d3d38b0";
+public static String firstRequest = "https://graph.facebook.com/oauth/authorize?"
++ "client_id="
++ API_KEY
++ "&redirect_uri=http://www.facebook.com/connect/login_success.html&"
++ "scope=publish_stream,offline_access,create_event,read_stream,email,user_birthday,user_about_me,user_religion_politics,";
+
+public static String secondRequest="https://graph.facebook.com/oauth/access_token?"
++ "client_id="
++ API_KEY
++ "&redirect_uri=http://www.facebook.com/connect/login_success.html&"
++ "client_secret=" + SECRET + "&code=";
+public static String access_token = "";
+public static boolean firstRequestDone = false;
+public static boolean secondRequestDone = false;
+
+    
+    
+    
+    
+    
+    
     public LoginDoctor() {
         initComponents();
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -48,6 +87,7 @@ public class LoginDoctor extends javax.swing.JFrame {
         tb_email = new javax.swing.JTextField();
         tb_pwd = new javax.swing.JPasswordField();
         jLabel1 = new javax.swing.JLabel();
+        btnfb = new javax.swing.JButton();
 
         javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
         jFrame1.getContentPane().setLayout(jFrame1Layout);
@@ -91,6 +131,7 @@ public class LoginDoctor extends javax.swing.JFrame {
         tb_email.setBackground(new java.awt.Color(240, 240, 240));
         tb_email.setFont(new java.awt.Font("Tunga", 0, 20)); // NOI18N
         tb_email.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        tb_email.setText("gm@gmail.fr");
         tb_email.setToolTipText("Identifiant");
 
         tb_pwd.setBackground(new java.awt.Color(240, 240, 240));
@@ -120,37 +161,49 @@ public class LoginDoctor extends javax.swing.JFrame {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Dhelp/image/officialLogowithIcon.png"))); // NOI18N
 
+        btnfb.setIcon(new javax.swing.ImageIcon("C:\\Users\\user\\Desktop\\imagesDrhelp\\connect2.gif")); // NOI18N
+        btnfb.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnfbActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(82, 82, 82)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(59, 59, 59)
-                        .addComponent(tb_connecter)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(bu_creer_compte))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(85, 85, 85)
-                        .addComponent(jLabel1)
-                        .addGap(70, 70, 70)))
-                .addContainerGap(85, Short.MAX_VALUE))
+                        .addGap(167, 167, 167)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(83, 83, 83)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(141, 141, 141)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(tb_connecter)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(bu_creer_compte))
+                            .addComponent(btnfb, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(99, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(43, Short.MAX_VALUE)
+                .addGap(21, 21, 21)
                 .addComponent(jLabel1)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tb_connecter, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(bu_creer_compte, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnfb, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(19, 19, 19))
         );
 
         pack();
@@ -162,7 +215,7 @@ public class LoginDoctor extends javax.swing.JFrame {
        String a=null;
         AuthentifiactionDAO Auto = new AuthentifiactionDAO();
        String semail=tb_email.getText();
-       String spassword = tb_pwd.getText();
+       String spassword=tb_pwd.getText();
         
        //System.out.println("la valeur de la text field est : "+spassword);
        try{
@@ -202,6 +255,98 @@ public class LoginDoctor extends javax.swing.JFrame {
       Ajouter_Medecin am = new Ajouter_Medecin();
       am.setVisible(true);
     }//GEN-LAST:event_bu_creer_compteActionPerformed
+
+    private void btnfbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnfbActionPerformed
+        // TODO add your handling code here:
+        
+        
+         authFrame.addWindowListener (new WindowAdapter(){
+            @Override
+            public void windowClosing (WindowEvent e){
+                setVisible(true);
+            }
+        });
+        setVisible(false);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                NativeInterface.open();
+                NativeInterface.initialize();
+                // Create the JWebBrowser and add the WebBrowserAdapter
+                JPanel webBrowserPanel = new JPanel(new BorderLayout());
+                final JWebBrowser webBrowser = new JWebBrowser();
+                webBrowser.navigate(firstRequest);
+                webBrowserPanel.add(webBrowser,BorderLayout.CENTER);
+                authFrame.add(webBrowserPanel);
+                authFrame.setSize(400, 500);
+                authFrame.setVisible(true);
+                webBrowser.addWebBrowserListener(new WebBrowserAdapter() {
+                    @Override
+                    public void locationChanged(WebBrowserNavigationEvent e) {
+                        super.locationChanged(e);
+                        // Check if first request was not done
+                        if (!firstRequestDone) {
+                            // Check if you left the location and were redirected to the next
+                            // location
+                            if (e.getNewResourceLocation().contains("http://www.facebook.com/connect/login_success.html?code=")){
+                                // If it successfully redirects you, get the verification code
+                                // and go for a second request
+                                String[] splits = e.getNewResourceLocation().split("=");
+                                String stage2temp = secondRequest + splits[1];
+                                // System.out.println("First ="+splits[1]);
+                                webBrowser.navigate(stage2temp);
+                                firstRequestDone = true;
+                            }
+                        } else {
+                            // If secondRequest is not done yet, you perform this and get the
+                            // access_token
+                            if (!secondRequestDone) {
+                                System.out.println(webBrowser.getHTMLContent());
+                                // Create reader with the html content
+                                StringReader readerSTR = new StringReader(webBrowser.getHTMLContent());
+                                // JOptionPane.showMessageDialog(rootPane, readerSTR);
+                                // Create a callback for html parser
+                                HTMLEditorKit.ParserCallback callback =
+                                new HTMLEditorKit.ParserCallback() {
+                                    @Override
+                                    public void handleText(char[] data,int pos) {
+                                        // System.out.println(data);
+                                        // because there is only one line with the access_token
+                                        // in the html content you can parse it.
+                                        String string = new String(data);
+                                        String[] temp1 = string.split("&");
+                                        String[] temp2 = temp1[0].split("=");
+                                        // System.out.println("access tocken="+temp2);
+                                        access_token = temp2[1];
+                                    }
+                                };
+                                try {
+                                    // Call the parse method
+                                    new ParserDelegator().parse(readerSTR,callback,false);
+                                    // webBrowser.setHTMLContent("Bonjour");
+                                    GraphReaderExample.a=access_token;
+                                    GraphReaderExample eee =new GraphReaderExample(GraphReaderExample.a);
+                                    eee.fetchObject();
+                                    if(d11.rechmail()==false) {
+                                        d11.AjouterDoctor();
+                                    }
+                                    int c= d11.AuthentificationClient();
+                                    authFrame.setVisible(false);
+                                    JOptionPane.showMessageDialog(null, "votre compte a eté creer avec succes , veuillé attendre la confirmation de ladministrateur");
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
+                                }
+                                // After everything is done, you can dispose the jframe
+                                //authFrame.dispose();
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        
+        
+    }//GEN-LAST:event_btnfbActionPerformed
     
     /**
      * @param args the command line arguments
@@ -245,6 +390,7 @@ public class LoginDoctor extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnfb;
     private javax.swing.JButton bu_creer_compte;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JLabel jLabel1;

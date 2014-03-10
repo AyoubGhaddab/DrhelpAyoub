@@ -251,5 +251,45 @@ public class AddCommentDAO {
                 if (dbConnection != null){dbConnection.close();}    
         }
     }
+      public List<Commentaires> AfficherCommentaires(int id) throws SQLException 
+    {
+        List<Commentaires> mylist = new ArrayList<>();
+        
+        try {
+            MyConnection mc = new MyConnection();
+            dbConnection = mc.seconnecter();
+            statement = dbConnection.createStatement();
+            
+            String request ="select * from commentaires WHERE 	id_original_sub='"+id+"'  " ; 
+            
+            ResultSet rs = statement.executeQuery(request);
+            while (rs.next())
+            {
+                String sComm= rs.getString("contenu_cmnt");
+                String sauteur= rs.getString("auteur_cmnt");
+                String sdate= rs.getString("dc_cmnt");
+                int sidorginal = rs.getInt("id_original_sub");
+                
+                Commentaires cm = new Commentaires(sComm, sauteur, sdate, sidorginal);
+               
+                
+                
+                
+                mylist.add(cm);
+            }           
+                               } catch (SQLException ex) {
+            System.out.println(" erreur"+ex);
+            JOptionPane.showMessageDialog(null, ex); 
+                  }
+        finally{
+            
+                if (statement != null){statement.close();}
+                if (dbConnection != null){dbConnection.close();}
+                
+                
+        }
+        return mylist ;
+    }
+    
      
 }

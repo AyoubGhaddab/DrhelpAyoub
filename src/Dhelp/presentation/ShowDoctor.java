@@ -4,6 +4,7 @@
  */
 package Dhelp.presentation;
 import  Dhelp.DAO.AfficherDoctor;
+import Dhelp.entities.Admin;
 import Dhelp.entities.Personnes;
 import java.awt.*;
 import java.sql.*;
@@ -19,11 +20,19 @@ import net.proteanit.sql.DbUtils;
  */
 public class ShowDoctor extends javax.swing.JFrame {
 
-    /**
-     * Creates new form ShowDoctor
-     */
+   Admin admin = null;
     public ShowDoctor() {
         initComponents();
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
+        bu_AfficherAllDoctorsActionPerformed(null);
+        Boolean Auth = false;
+        jp_info.setVisible(false);
+    }
+     public ShowDoctor(Admin a) {
+        initComponents();
+        admin = a;
+        lb_login.setText(a.getLogin_admin());
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
         bu_AfficherAllDoctorsActionPerformed(null);
@@ -72,6 +81,7 @@ public class ShowDoctor extends javax.swing.JFrame {
         tb_prenom = new javax.swing.JTextField();
         tb_email = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
+        lb_login = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setForeground(new java.awt.Color(255, 255, 255));
@@ -298,48 +308,53 @@ public class ShowDoctor extends javax.swing.JFrame {
         jLabel10.setForeground(new java.awt.Color(153, 153, 153));
         jLabel10.setText("Cliquer sur un champ dans la liste pour modifer le contenu");
 
+        lb_login.setForeground(new java.awt.Color(0, 204, 255));
+        lb_login.setText("jLabel11");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jp_info, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel2)
+                        .addComponent(jLabel2)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lb_login)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(tb_backPage, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(bu_off, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jp_info, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(tb_search, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(rb_nom)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(rb_spec))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(tb_search, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(rb_nom)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(rb_spec))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 571, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                    .addComponent(bu_AfficherAllDoctors, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(tb_searchBox, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(tb_delete_doctor, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(bu_open, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(bu_update, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(bu_ok, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(bu_load)))
-                            .addComponent(jLabel10))))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 571, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(bu_AfficherAllDoctors, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tb_searchBox, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tb_delete_doctor, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(bu_open, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(bu_update, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(bu_ok, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(bu_load)))
+                        .addComponent(jLabel10)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -355,6 +370,8 @@ public class ShowDoctor extends javax.swing.JFrame {
                                     .addComponent(tb_backPage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(34, 34, 34))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(lb_login)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(tb_search, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(rb_nom)
@@ -422,6 +439,7 @@ public class ShowDoctor extends javax.swing.JFrame {
             amod.addRow(objects);
         }
         this.Table_m.setModel(amod);
+        
         
     }
        
@@ -503,15 +521,18 @@ public class ShowDoctor extends javax.swing.JFrame {
 
     private void bu_offActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bu_offActionPerformed
         this.setVisible(false);
-        LoginDoctor lg = new LoginDoctor();
+        LoginAdmin lg = new LoginAdmin();
         lg.setVisible(true);
                 
     }//GEN-LAST:event_bu_offActionPerformed
 
     private void tb_backPageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tb_backPageActionPerformed
         DrhelpMenu dm = null;
-        
-            dm = new DrhelpMenu();
+        try {
+            dm = new DrhelpMenu(admin);
+        } catch (SQLException ex) {
+            Logger.getLogger(ShowDoctor.class.getName()).log(Level.SEVERE, null, ex);
+        }
       
        
         this.setVisible(false);
@@ -619,6 +640,7 @@ public class ShowDoctor extends javax.swing.JFrame {
     }//GEN-LAST:event_tb_searchBoxActionPerformed
 
     private void bu_AfficherAllDoctorsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bu_AfficherAllDoctorsActionPerformed
+        boolean accepte = false;
         AfficherDoctor ad = new AfficherDoctor();
        ArrayList<Personnes> lp = new ArrayList<Personnes>();
        try{
@@ -658,6 +680,7 @@ public class ShowDoctor extends javax.swing.JFrame {
            
         }
         this.Table_m.setModel(amod);
+        
         
         
         
@@ -727,6 +750,7 @@ public class ShowDoctor extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel jp_info;
+    private javax.swing.JLabel lb_login;
     private javax.swing.JRadioButton rb_nom;
     private javax.swing.JRadioButton rb_spec;
     private javax.swing.JButton tb_backPage;

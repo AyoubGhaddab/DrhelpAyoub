@@ -7,13 +7,23 @@ import java.util.Date;
  */
 public class Article {
     private String nom_article;
-    private  String note_article;
+    private  float note_article;
     private  String date_article;
     private String description_article;
     private String etat;
     private int id;
     private String categorie;
     private String chemin_fichier;
+
+    public Article(String nom_article, float note_article, String date_article, String description_article, String etat, String categorie, String chemin_fichier) {
+        this.nom_article = nom_article;
+        this.note_article = note_article;
+        this.date_article = date_article;
+        this.description_article = description_article;
+        this.etat = etat;
+        this.categorie = categorie;
+        this.chemin_fichier = chemin_fichier;
+    }
 
     public String getChemin_fichier() {
         return chemin_fichier;
@@ -48,7 +58,7 @@ public class Article {
     }
 
     public Article(){}
-    public Article(String nom_article,String note_article,String date_article,String description_article,String etat,String categorie){
+    public Article(String nom_article,float note_article,String date_article,String description_article,String etat,String categorie){
     this.nom_article=nom_article;
     this.note_article=note_article;
     this.date_article=date_article;
@@ -66,11 +76,11 @@ public class Article {
         this.nom_article = nom_article;
     }
 
-    public String getNote_article() {
+    public float getNote_article() {
         return note_article;
     }
 
-    public void setNote_article(String note_article) {
+    public void setNote_article(float note_article) {
         this.note_article = note_article;
     }
 
@@ -89,4 +99,19 @@ public class Article {
     public void setDescription_article(String description_article) {
         this.description_article = description_article;
     }
+
+    public Article(String nom_article, float note_article, String date_article, String description_article, String etat, int id, String categorie, String chemin_fichier) {
+        this.nom_article = nom_article;
+        this.note_article = note_article;
+        this.date_article = date_article;
+        this.description_article = description_article;
+        this.etat = etat;
+        this.id = id;
+        this.categorie = categorie;
+        this.chemin_fichier = chemin_fichier;
+    }
+
+    
+
+    
 }

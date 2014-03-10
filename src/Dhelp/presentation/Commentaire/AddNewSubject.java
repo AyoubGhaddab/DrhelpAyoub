@@ -53,8 +53,9 @@ Sujets loadsujet = null;
     }
     }
     public AddNewSubject(Personnes p) {
-        bu_update.setVisible(false);
+        
         initComponents();
+        bu_update.setVisible(false);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
         ptdr=p;

@@ -70,6 +70,7 @@ public class LoginAdmin extends javax.swing.JFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
         tb_login.setBackground(new java.awt.Color(240, 240, 240));
+        tb_login.setText("ayoub@drhelp.tn");
         tb_login.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 tb_loginKeyReleased(evt);
@@ -80,6 +81,7 @@ public class LoginAdmin extends javax.swing.JFrame {
 
         tb_pwd.setBackground(new java.awt.Color(240, 240, 240));
         tb_pwd.setFont(new java.awt.Font("Tunga", 0, 18)); // NOI18N
+        tb_pwd.setText("a");
         tb_pwd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tb_pwdActionPerformed(evt);

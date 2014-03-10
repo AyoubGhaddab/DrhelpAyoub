@@ -2,6 +2,7 @@
 package Dhelp.DAO;
 
 import Dhelp.entities.Personnes;
+import Dhelp.presentation.GraphReaderExample;
 import Dhelp.util.MyConnection;
 
 import java.sql.Statement;
@@ -113,6 +114,75 @@ public class AddDoctor {
         }
         return status;
     }
+    
+    public int AjouterDoctor(){
+int key = 0;
+try {
+            PreparedStatement ps;
+            String req = "insert into personnes(date_naissance,login_p,prenom_p,nom_p,pays,email,accepte_p,ON_medecin,pwd_p,nbr_alertes,specialite,Code_medecin)"
+                    + " values ('" + GraphReaderExample.daten + "','" + GraphReaderExample.prenom + "','" + GraphReaderExample.prenom + "','" + GraphReaderExample.nom +"','" + GraphReaderExample.adr + "','" + GraphReaderExample.mail + "',false,true,'0000','0','en attente','0000')";
+
+
+            ps = MyConnection.getInstance().prepareStatement(req);
+ps.executeUpdate(req, ps.RETURN_GENERATED_KEYS);//permession pr l méthode pr retourner le clé sans gérer des erreurs
+ResultSet res = ps.getGeneratedKeys();
+while (res.next()) {
+key = res.getInt(1);
+}
+} catch (SQLException ex) {
+Logger.getLogger(AddDoctor.class.getName()).log(Level.SEVERE, null, ex);
+//return p.getId();
+}
+return key;
+}
+    
+    
+    public boolean rechmail(){ 
+boolean a=false;
+try {
+ 
+            PreparedStatement ps;
+
+String req = "select email from personnes where email='"+GraphReaderExample.mail+"'";
+            ps = MyConnection.getInstance().prepareStatement(req);
+//pst.setString(1, modele);
+ResultSet res = ps.executeQuery();
+while (res.next()) {
+a=true;
+}
+} catch (SQLException ex) {
+Logger.getLogger(AddDoctor.class.getName()).log(Level.SEVERE, null, ex);
+}
+return a;
+}
+    
+    
+    
+    
+    
+    
+      public int AuthentificationClient(){
+int key = 0;
+try {
+    
+                PreparedStatement ps;
+
+    String req = "select * from personnes where email='"+GraphReaderExample.mail +"'";
+
+            ps = MyConnection.getInstance().prepareStatement(req);
+//PreparedStatement ps = myConexion.prepareStatement(req);
+//ps.setString(1, pwd);
+// ps.setString(2, pwd);
+ResultSet res = ps.executeQuery(req);
+while (res.next()) {
+key = res.getInt(1);
+}
+} catch (SQLException ex) {
+Logger.getLogger(AddDoctor.class.getName()).log(Level.SEVERE, null, ex);
+//return p.getId();
+}
+return key;
+}
     
             
 }

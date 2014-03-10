@@ -55,7 +55,7 @@ public class AddNewSubjectDAO {
             MyConnection mc = new MyConnection();
             dbConnection = mc.seconnecter();
             statement = dbConnection.createStatement();
-            String sql="select nom_suj,nom_categ,contenu_suj,date_cr_suj,id_suj from sujet WHERE nom_suj='"+s+"' OR nom_suj like '"+s+"%' OR contenu_suj like '"+s+"%' ;";
+            String sql="select nom_suj,nom_categ,contenu_suj,date_cr_suj,id_suj from sujet WHERE  nom_suj like '%"+s+"%' OR contenu_suj like '%"+s+"%' ;";
                                 
             ResultSet rs= statement.executeQuery(sql);
            while (rs.next())

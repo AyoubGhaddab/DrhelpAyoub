@@ -5,18 +5,26 @@
 package Dhelp.presentation;
 
 import Dhelp.DAO.AfficherDoctor;
+import Dhelp.DAO.*;
 import Dhelp.DAO.AuthentifiactionDAO;
 import Dhelp.entities.Admin;
 import Dhelp.entities.Personnes;
 import Dhelp.presentation.*;
+import Dhelp.presentation.Admin.Article_form;
+import Dhelp.presentation.Admin.EvaluerArticleByAyoub;
+import Dhelp.presentation.Categorie.ManageCategorie;
+
 import Dhelp.presentation.Commentaire.AjouterCommentaire;
 import Dhelp.presentation.Mail.RapportPourClient;
 import Dhelp.presentation.Personnes.Ajouter_Client;
+import Dhelp.presentation.Personnes.ShowClient;
 import java.awt.Dimension;
+
 import java.awt.Toolkit;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.poi.hssf.record.formula.Ptg;
 
 
 /**
@@ -25,7 +33,8 @@ import java.util.logging.Logger;
  */
 public class DrhelpMenu extends javax.swing.JFrame {
     Personnes pdr;
-    Admin a =null;
+    Admin administrator =null;
+    String user= "";
     public DrhelpMenu(){
         initComponents();
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -33,10 +42,20 @@ public class DrhelpMenu extends javax.swing.JFrame {
     }
     public DrhelpMenu(Admin admin) throws SQLException {
         initComponents();
-        
+        jp_notif.setVisible(false);
+        user="admin";
+        administrator = admin;
         bu_Alertes.setEnabled(false);
-        bu_article.setEnabled(false);
+         ArticleArticleDAO art=new  ArticleArticleDAO();
+         if (art.NombreArticleConfirmer()>0) {
+             jp_notif.setVisible(true);
+           lb_notification.setText(art.NombreArticleConfirmer()+""); 
+        }
+         else{ jp_notif.setVisible(false);
+         }
+        tb_evaluer.setEnabled(false);
         bu_sujet.setEnabled(false);
+        tb_ecrireArticle.setEnabled(false);
         lb_login.setText(admin.getLogin_admin());
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
@@ -45,6 +64,14 @@ public class DrhelpMenu extends javax.swing.JFrame {
     public DrhelpMenu(Personnes p)
     {
         initComponents();
+        tb_ecrireArticle.setEnabled(false);
+        if(p.isOn_medecin()){
+        tb_ecrireArticle.setEnabled(true);}
+        
+        
+        
+        jp_notif.setVisible(false);
+        user="personne";
         bu_BoiteMedecin.setEnabled(false);
         tb_people.setEnabled(false);
         bu_categorie.setEnabled(false);
@@ -65,14 +92,20 @@ public class DrhelpMenu extends javax.swing.JFrame {
     private void initComponents() {
 
         jLabel3 = new javax.swing.JLabel();
+        jp_notif = new javax.swing.JPanel();
+        lb_notification = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         bu_BoiteMedecin = new javax.swing.JButton();
         bu_Alertes = new javax.swing.JButton();
         bu_categorie = new javax.swing.JButton();
-        bu_article = new javax.swing.JButton();
         bu_categorie2 = new javax.swing.JButton();
         tb_people = new javax.swing.JButton();
         bu_sujet = new javax.swing.JButton();
+        tb_evaluer = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        tb_ecrireArticle = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         lb_login = new javax.swing.JLabel();
         lb_deconnect = new javax.swing.JLabel();
@@ -83,9 +116,26 @@ public class DrhelpMenu extends javax.swing.JFrame {
         setBackground(new java.awt.Color(255, 255, 255));
         setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         setForeground(new java.awt.Color(240, 240, 240));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
         jLabel3.setForeground(new java.awt.Color(153, 153, 153));
         jLabel3.setText("PI Dev ESPRIT 2014 - All rights are reserved");
+
+        jp_notif.setLayout(null);
+
+        lb_notification.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        lb_notification.setForeground(new java.awt.Color(255, 0, 0));
+        lb_notification.setText("label");
+        jp_notif.add(lb_notification);
+        lb_notification.setBounds(10, 20, 27, 14);
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Dhelp/image/alert1.png"))); // NOI18N
+        jp_notif.add(jLabel1);
+        jLabel1.setBounds(0, 8, 48, 50);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -104,8 +154,11 @@ public class DrhelpMenu extends javax.swing.JFrame {
         });
 
         bu_categorie.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Dhelp/image/003.png"))); // NOI18N
-
-        bu_article.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Dhelp/image/004.png"))); // NOI18N
+        bu_categorie.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bu_categorieActionPerformed(evt);
+            }
+        });
 
         bu_categorie2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Dhelp/image/005.png"))); // NOI18N
 
@@ -117,50 +170,85 @@ public class DrhelpMenu extends javax.swing.JFrame {
         });
 
         bu_sujet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Dhelp/image/0100.png"))); // NOI18N
-        bu_sujet.setToolTipText("");
+        bu_sujet.setToolTipText("Sujet");
         bu_sujet.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bu_sujetActionPerformed(evt);
             }
         });
 
+        tb_evaluer.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Dhelp/image/008.png"))); // NOI18N
+        tb_evaluer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tb_evaluerActionPerformed(evt);
+            }
+        });
+
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Dhelp/image/004.png"))); // NOI18N
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        tb_ecrireArticle.setIcon(new javax.swing.ImageIcon("C:\\Users\\user\\Desktop\\imagesDrhelp\\File Write Document.png")); // NOI18N
+        tb_ecrireArticle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tb_ecrireArticleActionPerformed(evt);
+            }
+        });
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Dhelp/image/custom-reports.png"))); // NOI18N
+        jButton1.setActionCommand("");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(bu_BoiteMedecin, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(30, 30, 30)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(bu_BoiteMedecin, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tb_evaluer, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(bu_Alertes, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(bu_categorie, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(bu_article, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(bu_categorie2, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(tb_people, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(bu_sujet, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(bu_Alertes, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(tb_ecrireArticle, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(bu_categorie, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tb_people, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addGap(1, 1, 1))
+                    .addComponent(bu_sujet, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(13, 13, 13)
+                .addGap(21, 21, 21)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(bu_article, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(bu_Alertes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(bu_BoiteMedecin, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(bu_categorie, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(bu_categorie, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tb_ecrireArticle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(bu_categorie2, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)
+                    .addComponent(bu_categorie2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tb_people, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(bu_sujet, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(bu_sujet, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tb_evaluer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(34, Short.MAX_VALUE))
         );
 
@@ -186,57 +274,63 @@ public class DrhelpMenu extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(83, 83, 83)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(207, 207, 207)
-                        .addComponent(jLabel3))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(127, 127, 127)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lb_login)
-                                .addGap(175, 175, 175)
-                                .addComponent(lb_deconnect))
-                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap(122, Short.MAX_VALUE))
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lb_login)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel3)
+                        .addGap(18, 18, 18)
+                        .addComponent(lb_deconnect)))
+                .addContainerGap(80, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jp_notif, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(104, 104, 104))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(124, 124, 124))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(37, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap(33, Short.MAX_VALUE)
                 .addComponent(jLabel2)
-                .addGap(32, 32, 32)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(lb_login)
-                    .addComponent(lb_deconnect))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jp_notif, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel3)
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(lb_deconnect)
+                    .addComponent(jLabel4)
+                    .addComponent(lb_login))
+                .addGap(49, 49, 49))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void bu_BoiteMedecinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bu_BoiteMedecinActionPerformed
-        ShowDoctor sd = new ShowDoctor();
+        ShowDoctor sd = new ShowDoctor(administrator);
         this.setVisible(false);
         sd.setVisible(true);
     }//GEN-LAST:event_bu_BoiteMedecinActionPerformed
 
     private void tb_peopleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tb_peopleActionPerformed
-       Ajouter_Client ac = new Ajouter_Client();
+       ShowClient ac = new ShowClient(administrator);
+        //Ajouter_Client ac = new Ajouter_Client();
        this.setVisible(false);
        ac.setVisible(true);
     }//GEN-LAST:event_tb_peopleActionPerformed
 
     private void bu_AlertesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bu_AlertesActionPerformed
-        RapportPourClient rp = new RapportPourClient();
+        RapportPourClient rp = new RapportPourClient(pdr);
         this.setVisible(false);
         rp.setVisible(true);
     }//GEN-LAST:event_bu_AlertesActionPerformed
@@ -259,6 +353,37 @@ public class DrhelpMenu extends javax.swing.JFrame {
         }
             
     }//GEN-LAST:event_lb_deconnectMouseClicked
+
+    private void bu_categorieActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bu_categorieActionPerformed
+       ManageCategorie mc = new ManageCategorie(administrator);
+       mc.setVisible(true);
+       this.setVisible(false);
+    }//GEN-LAST:event_bu_categorieActionPerformed
+
+    private void tb_evaluerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tb_evaluerActionPerformed
+      EvaluerArticleByAyoub ac = new EvaluerArticleByAyoub(pdr);
+       ac.setVisible(true);
+       this.setVisible(false);
+    }//GEN-LAST:event_tb_evaluerActionPerformed
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+       
+        
+    }//GEN-LAST:event_formWindowOpened
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+       if(user.equals("admin")){
+        Article_form af = new Article_form(administrator);
+            af.setVisible(true);
+            this.setVisible(false);}
+       
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void tb_ecrireArticleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tb_ecrireArticleActionPerformed
+        Ajout_article_form aj = new Ajout_article_form(pdr);
+        aj.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_tb_ecrireArticleActionPerformed
 
     /**
      * @param args the command line arguments
@@ -308,16 +433,22 @@ public class DrhelpMenu extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bu_Alertes;
     private javax.swing.JButton bu_BoiteMedecin;
-    private javax.swing.JButton bu_article;
     private javax.swing.JButton bu_categorie;
     private javax.swing.JButton bu_categorie2;
     private javax.swing.JButton bu_sujet;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jp_notif;
     private javax.swing.JLabel lb_deconnect;
     private javax.swing.JLabel lb_login;
+    private javax.swing.JLabel lb_notification;
+    private javax.swing.JButton tb_ecrireArticle;
+    private javax.swing.JButton tb_evaluer;
     private javax.swing.JButton tb_people;
     // End of variables declaration//GEN-END:variables
 }

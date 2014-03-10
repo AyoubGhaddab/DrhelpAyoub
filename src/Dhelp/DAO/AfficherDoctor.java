@@ -137,7 +137,7 @@ public class AfficherDoctor {
             dbConnection = mc.seconnecter();
             statement = dbConnection.createStatement();
             String sql="select login_p, prenom_p, nom_p, date_naissance, pays, Code_medecin, email, specialite from personnes WHERE nom_p='"+s+"' "
-                    + "OR nom_p like '"+s+"%' AND ON_medecin='1'  ";
+                    + "OR nom_p like '%"+s+"%' AND ON_medecin='1'  ";
                                 
             ResultSet rs= statement.executeQuery(sql);
            while (rs.next())
@@ -175,7 +175,7 @@ public class AfficherDoctor {
             dbConnection = mc.seconnecter();
             statement = dbConnection.createStatement();
             String sql="select login_p, prenom_p, nom_p, date_naissance, pays, Code_medecin, email, specialite from personnes WHERE specialite='"+s+"' "
-                    + "OR specialite like '"+s+"%'  AND ON_medecin='1'  ";
+                    + "OR specialite like '%"+s+"%'  AND ON_medecin='1'  ";
                                 
             ResultSet rs= statement.executeQuery(sql);
            while (rs.next())

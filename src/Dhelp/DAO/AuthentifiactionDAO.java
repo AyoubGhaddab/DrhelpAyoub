@@ -52,12 +52,12 @@ public class AuthentifiactionDAO {
             MyConnection mc = new MyConnection();
             dbConnection = mc.seconnecter();
             statement = dbConnection.createStatement();
-            String sql="select pwd_p from personnes where email='"+p+"' and ON_medecin=1 and accepte_p=1 ";
+            String sql="select pwd_p,	ON_medecin from personnes where email='"+p+"'  and accepte_p=1 ";
             ResultSet res= statement.executeQuery(sql);
             System.out.println("select avec succees");
             if(res.next())
             {
-             
+             Integer Onmedecin = res.getInt("ON_medecin");
              dbpass = res.getString(1);
              System.out.println(dbpass);
              return dbpass;
@@ -120,7 +120,8 @@ public class AuthentifiactionDAO {
                 String snom= rs.getString("nom_p");
                 String sdatenaissance= rs.getString("date_naissance");
                 String spays= rs.getString("pays");
-                String semail = rs.getString("email");String sspecialite = rs.getString("specialite");
+                String semail = rs.getString("email");
+                String sspecialite = rs.getString("specialite");
                 Integer scodemedecin = rs.getInt("Code_medecin");
                 Integer sONmedecin = rs.getInt("ON_medecin");
                 if (sONmedecin ==1) {
@@ -184,6 +185,6 @@ public class AuthentifiactionDAO {
         }
         return admin ;
     }
-    
+
     
 }
